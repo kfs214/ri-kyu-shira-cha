@@ -8,11 +8,15 @@ function findSheetsToBeNotified(): GoogleAppsScript.Spreadsheet.Sheet[] {
 }
 
 // メール送信時の件名
-// 注目銘柄がある場合のみ、文言を付加
-function buildSubject(hasTickerToBeNotified: boolean) {
+// 注目銘柄の有無で分岐
+function buildSubject(tickers: GoogleAppsScript.Spreadsheet.Sheet[]) {
+  const hasTickerToBeNotified = tickers.length > 0;
+
   return `${
     hasTickerToBeNotified ? "【注目銘柄あり】 " : ""
-  }RI-kyu-shira-cha (#E6E3C5)`;
+  }RI-kyu-shira-cha (#E6E3C5) / when-to-sell${
+    hasTickerToBeNotified ? "" : " (注目銘柄なし)"
+  }`;
 }
 
 function buildSheetUrl(sheet: GoogleAppsScript.Spreadsheet.Sheet) {
@@ -47,7 +51,7 @@ function notifyByEmail() {
 
   // TODO ここでGOOGLEFINANCE最新化が必要かもしれない
   const sheetsToBeNotified = findSheetsToBeNotified();
-  const subject = buildSubject(findSheetsToBeNotified.length > 0);
+  const subject = buildSubject(sheetsToBeNotified);
   const composedText = composeText(sheetsToBeNotified);
 
   Logger.log(

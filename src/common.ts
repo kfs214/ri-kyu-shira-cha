@@ -9,3 +9,4 @@ const TICKERS = "__TICKERS__";
 // SpreadsheetApp
 // ================
 const activeSpreadSheet = SpreadsheetApp.getActiveSpreadsheet();
+const activeSpreadSheetUrl = activeSpreadSheet.getUrl();

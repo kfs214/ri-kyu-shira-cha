@@ -14,7 +14,7 @@ function buildSubject(tickers: GoogleAppsScript.Spreadsheet.Sheet[]) {
 
   return `${
     hasTickerToBeNotified ? "【注目銘柄あり】 " : ""
-  }RI-kyu-shira-cha (#E6E3C5) / when-to-sell${
+  }RI-kyu-shira-cha (#E6E3C5) / 50days-averages${
     hasTickerToBeNotified ? "" : " (注目銘柄なし)"
   }`;
 }

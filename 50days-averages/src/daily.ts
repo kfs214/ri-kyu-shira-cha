@@ -31,8 +31,9 @@ function composeText(sheets: GoogleAppsScript.Spreadsheet.Sheet[]) {
   return sheets
     .map((sheet) => {
       const sheetName = sheet.getSheetName();
+      const refDate = sheet.getRange(2, 1).getDisplayValue() as string;
 
-      return `======\n=${sheetName}\n======\n${buildSheetUrl(
+      return `======\n=${sheetName}\n======\n${refDate}\n${buildSheetUrl(
         sheet
       )}\n${buildFinanceUrl(sheetName)}`;
     })

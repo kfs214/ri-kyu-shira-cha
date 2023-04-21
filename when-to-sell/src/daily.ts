@@ -25,14 +25,35 @@ const activeSheet = activeSpreadSheet.getActiveSheet();
 
 // 通知対象となる銘柄を抽出
 // G列に通知要否を格納
+// 明示的な最新化要否の判定のため、全件をbidと共に返却
 function findTickersToBeNotified(): string[] {
+  const lastRowIndex = activeSheet.getLastRow();
+
+  return (
+    activeSheet
+      .getRange(3, 3, lastRowIndex - headerRowLength, pluckedColumnLength)
+      .getDisplayValues()
+      // .filter((rowValues) => rowValues[shouldNotifyColumnIndex])
+      // .map(([ticker]) => ticker);
+      .map((rowValues) => {
+        const ticker = rowValues[0];
+        const bid = rowValues[3];
+
+        return `${ticker}: ${bid}`;
+      })
+  );
+}
+
+// 通知すべき銘柄があるか判定
+// 暫定的に全件返却にしているため、件名の出し分けで使用
+function hasTickersToBeNotified() {
   const lastRowIndex = activeSheet.getLastRow();
 
   return activeSheet
     .getRange(3, 3, lastRowIndex - headerRowLength, pluckedColumnLength)
     .getValues()
     .filter((rowValues) => rowValues[shouldNotifyColumnIndex])
-    .map(([ticker]) => ticker);
+    .flat() as string[];
 }
 
 // メール送信時の件名
@@ -59,7 +80,7 @@ function notifyByEmail() {
 
   // TODO ここでGOOGLEFINANCE最新化が必要かもしれない
   const tickersToBeNotified = findTickersToBeNotified();
-  const subject = buildSubject(tickersToBeNotified);
+  const subject = buildSubject(hasTickersToBeNotified());
   const composedText = tickersToBeNotified.join("\n");
 
   Logger.log(

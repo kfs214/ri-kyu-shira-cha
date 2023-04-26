@@ -7,6 +7,16 @@ function findSheetsToBeNotified(): GoogleAppsScript.Spreadsheet.Sheet[] {
     .filter((sheet) => sheet.getRange("H2").getValue() === true);
 }
 
+// ひとまず全件返却してみる
+// ASK against AVGの低い順に並べ替えて返却
+function selectAllSheetsOrderByAskRate(): GoogleAppsScript.Spreadsheet.Sheet[] {
+  return [
+    ...activeSpreadSheet
+      .getSheets()
+      .filter((sheet) => !settingSheetNameRegex.test(sheet.getSheetName())),
+  ].sort((a, b) => a.getRange(2, 6).getValue() - b.getRange(2, 6).getValue());
+}
+
 // メール送信時の件名
 // 注目銘柄の有無で分岐
 function buildSubject(tickers: GoogleAppsScript.Spreadsheet.Sheet[]) {
@@ -32,8 +42,9 @@ function composeText(sheets: GoogleAppsScript.Spreadsheet.Sheet[]) {
     .map((sheet) => {
       const sheetName = sheet.getSheetName();
       const refDate = sheet.getRange(2, 1).getDisplayValue() as string;
+      const askAgainstAvg = sheet.getRange(2, 6).getDisplayValue() as string;
 
-      return `======\n=${sheetName}\n======\n${refDate}\n${buildSheetUrl(
+      return `======\n=${sheetName}\n======\n${refDate}\nASK against AVG: ${askAgainstAvg}\n${buildSheetUrl(
         sheet
       )}\n${buildFinanceUrl(sheetName)}`;
     })
@@ -52,8 +63,9 @@ function notifyByEmail() {
 
   // TODO ここでGOOGLEFINANCE最新化が必要かもしれない
   const sheetsToBeNotified = findSheetsToBeNotified();
+  const allSheets = selectAllSheetsOrderByAskRate();
   const subject = buildSubject(sheetsToBeNotified);
-  const composedText = composeText(sheetsToBeNotified);
+  const composedText = composeText([...sheetsToBeNotified, ...allSheets]);
 
   Logger.log(
     `mail to be sent... notifiedEmail:${notifiedEmail} subject:${subject} composedText:${composedText}`

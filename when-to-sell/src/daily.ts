@@ -6,12 +6,12 @@
 const headerRowLength = 2;
 
 // 抽出範囲の列数
-const pluckedColumnLength = 5;
+const pluckedColumnLength = 6;
 
 // 通知要否変数の位置
 // 抽出範囲内で何列目か
 // 「0」始まり
-const shouldNotifyColumnIndex = 4;
+const shouldNotifyColumnIndex = 5;
 
 // ================
 // SpreadsheetApp

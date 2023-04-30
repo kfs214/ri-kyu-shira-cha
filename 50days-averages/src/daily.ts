@@ -43,8 +43,9 @@ function composeText(sheets: GoogleAppsScript.Spreadsheet.Sheet[]) {
       const sheetName = sheet.getSheetName();
       const refDate = sheet.getRange(2, 1).getDisplayValue() as string;
       const askAgainstAvg = sheet.getRange(2, 6).getDisplayValue() as string;
+      const shouldNotify = sheet.getRange(2, 8).getDisplayValue() as string;
 
-      return `======\n=${sheetName}\n======\n${refDate}\nASK against AVG: ${askAgainstAvg}\n${buildSheetUrl(
+      return `======\n=${sheetName}\n======\n${refDate}\nASK against AVG: ${askAgainstAvg}\nShould Notify: ${shouldNotify}\n${buildSheetUrl(
         sheet
       )}\n${buildFinanceUrl(sheetName)}`;
     })
@@ -65,7 +66,7 @@ function notifyByEmail() {
   const sheetsToBeNotified = findSheetsToBeNotified();
   const allSheets = selectAllSheetsOrderByAskRate();
   const subject = buildSubject(sheetsToBeNotified);
-  const composedText = composeText([...sheetsToBeNotified, ...allSheets]);
+  const composedText = composeText(allSheets);
 
   Logger.log(
     `mail to be sent... notifiedEmail:${notifiedEmail} subject:${subject} composedText:${composedText}`

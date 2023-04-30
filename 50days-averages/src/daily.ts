@@ -10,11 +10,9 @@ function findSheetsToBeNotified(): GoogleAppsScript.Spreadsheet.Sheet[] {
 // ひとまず全件返却してみる
 // ASK against AVGの低い順に並べ替えて返却
 function selectAllSheetsOrderByAskRate(): GoogleAppsScript.Spreadsheet.Sheet[] {
-  return [
-    ...activeSpreadSheet
-      .getSheets()
-      .filter((sheet) => !settingSheetNameRegex.test(sheet.getSheetName())),
-  ].sort((a, b) => a.getRange(2, 6).getValue() - b.getRange(2, 6).getValue());
+  return [...getAllMemberSheets()].sort(
+    (a, b) => a.getRange(2, 6).getValue() - b.getRange(2, 6).getValue()
+  );
 }
 
 // メール送信時の件名

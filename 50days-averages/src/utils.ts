@@ -11,12 +11,18 @@ function sheetName() {
 // utils
 // ================
 
+// テンプレートシート・設定シート以外を全て取得
+// テンプレートシート・設定シート： `__TEMPLATE__` 等
+function getAllMemberSheets() {
+  return activeSpreadSheet
+    .getSheets()
+    .filter((sheet) => !settingSheetNameRegex.test(sheet.getSheetName()));
+}
+
 // テンプレートシート・設定シート以外を全て削除
 // テンプレートシート・設定シート： `__TEMPLATE__` 等
 function deleteMemberSheets() {
-  activeSpreadSheet.getSheets().forEach((sheet) => {
-    if (settingSheetNameRegex.test(sheet.getSheetName())) return;
-
+  getAllMemberSheets().forEach((sheet) => {
     Logger.log(`${sheet.getSheetName()} to be deleted...`);
     activeSpreadSheet.deleteSheet(sheet);
   });

@@ -2,9 +2,9 @@
 // 各シートのH2セルに計算式が存在している
 function findSheetsToBeNotified(): GoogleAppsScript.Spreadsheet.Sheet[] {
   // getValue()の戻り値はbooleanであると保証されないため、trueとの厳密比較を行う
-  return activeSpreadSheet
-    .getSheets()
-    .filter((sheet) => sheet.getRange("H2").getValue() === true);
+  return getAllMemberSheets().filter(
+    (sheet) => sheet.getRange("H2").getValue() === true
+  );
 }
 
 // ひとまず全件返却してみる
@@ -60,7 +60,10 @@ function notifyByEmail() {
     return;
   }
 
-  // TODO ここでGOOGLEFINANCE最新化が必要かもしれない
+  // データを最新化
+  refreshAllMemberSheets();
+
+  // 通知内容を生成
   const sheetsToBeNotified = findSheetsToBeNotified();
   const allSheets = selectAllSheetsOrderByAskRate();
   const subject = buildSubject(sheetsToBeNotified);

@@ -28,6 +28,18 @@ function deleteMemberSheets() {
   });
 }
 
+// テンプレートシート・設定シート以外を全て最新化
+// テンプレートシート・設定シート： `__TEMPLATE__` 等
+// 最新のシート名を反映する場合・データを再取得する場合
+function refreshAllMemberSheets(): void {
+  Logger.log("refreshing all member sheets...");
+  getAllMemberSheets().forEach((sheet) => {
+    sheet.insertRows(1, 1);
+    sheet.deleteRows(1, 1);
+  });
+  Logger.log("refreshing completed.");
+}
+
 // シートのtickerからシート作成
 function copyTemplateByTickers() {
   // テンプレートシート・設定シートを取得
@@ -51,8 +63,9 @@ function copyTemplateByTickers() {
   // tickersの名前のsheetを追加
   tickers.forEach((ticker) => {
     Logger.log(`${ticker} to be added...`);
-    const copiedSheet = templateSheet.copyTo(activeSpreadSheet).setName(ticker);
-    copiedSheet.insertRows(1, 1);
-    copiedSheet.deleteRows(1, 1);
+    templateSheet.copyTo(activeSpreadSheet).setName(ticker);
   });
+
+  // シート名の変更を関数呼び出しに反映
+  refreshAllMemberSheets();
 }

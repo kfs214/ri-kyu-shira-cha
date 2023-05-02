@@ -61,7 +61,7 @@ function notifyByEmail() {
   }
 
   // データを最新化
-  refreshAllMemberSheets();
+  // refreshAllMemberSheets();
 
   // 通知内容を生成
   const sheetsToBeNotified = findSheetsToBeNotified();

@@ -1,8 +1,10 @@
 // 通知対象となる銘柄を抽出
-function findSheetsToBeNotified(): GoogleAppsScript.Spreadsheet.Sheet[] {
+function filterSheetsByAddress(
+  address: string
+): GoogleAppsScript.Spreadsheet.Sheet[] {
   // getValue()の戻り値はbooleanであると保証されないため、trueとの厳密比較を行う
   return getAllMemberSheets().filter(
-    (sheet) => sheet.getRange(shouldNotifyNotation).getValue() === true
+    (sheet) => sheet.getRange(address).getValue() === true
   );
 }
 
@@ -36,12 +38,20 @@ function composeText(sheets: GoogleAppsScript.Spreadsheet.Sheet[]) {
       const shouldNotify = sheet
         .getRange(shouldNotifyNotation)
         .getDisplayValue() as string;
+      const shouldSell = sheet
+        .getRange(shouldSellNotation)
+        .getDisplayValue() as string;
+      const shouldBuy = sheet
+        .getRange(shouldBuyNotation)
+        .getDisplayValue() as string;
 
       return `======
 =${sheetName}
 ======
 ${refDate}
 Should Notify: ${shouldNotify}
+Should Sell: ${shouldSell}
+Should Buy: ${shouldBuy}
 ${buildSheetUrl(sheet)}
 ${buildFinanceUrl(sheetName)}`;
     })
@@ -61,14 +71,36 @@ function notifyByEmail() {
   // データを最新化
   // refreshAllMemberSheets();
 
+  //
   // 通知内容を生成
-  const sheetsToBeNotified = findSheetsToBeNotified();
+  //
+
+  // 通知対象・売る銘柄・買う銘柄、それぞれシート抽出
+  const sheetsToBeNotified = filterSheetsByAddress(shouldNotifyNotation);
+  const sheetsToSell = filterSheetsByAddress(shouldSellNotation);
+  const sheetsToBuy = filterSheetsByAddress(shouldBuyNotation);
+
+  // 全件取得
   const allSheets = getAllMemberSheets();
+
+  // 件名生成
   const subject = buildSubject(sheetsToBeNotified);
 
-  const composedSheetsToBeNotified = composeText(sheetsToBeNotified);
+  // 通知対象・売る銘柄・買う銘柄、それぞれ文字列生成
+  const composedSheetsToSell = composeText(sheetsToSell);
+  const composedSheetsToBuy = composeText(sheetsToBuy);
   const composedAllSheets = composeText(allSheets);
-  const composedText = `${composedSheetsToBeNotified}
+
+  const composedText = `=========================
+to sell
+=========================
+${composedSheetsToSell}
+
+
+=========================
+to buy
+=========================
+${composedSheetsToBuy}
 
 
 =========================

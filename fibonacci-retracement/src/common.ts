@@ -16,3 +16,5 @@ const activeSpreadSheetUrl = activeSpreadSheet.getUrl();
 // ================
 const refDateNotation = "A1";
 const shouldNotifyNotation = "P1";
+const shouldBuyNotation = "L1";
+const shouldSellNotation = "M1";

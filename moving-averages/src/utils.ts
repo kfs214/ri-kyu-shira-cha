@@ -7,6 +7,11 @@ function sheetName() {
   return activeSpreadSheet.getActiveSheet().getName();
 }
 
+// タイムゾーンを指定し日付を取得
+function todayByTimeZone(timeZone: string) {
+  return Utilities.formatDate(new Date(), timeZone, "yyyy-MM-dd");
+}
+
 // ================
 // utils
 // ================

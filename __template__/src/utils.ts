@@ -8,8 +8,8 @@ function sheetName() {
 }
 
 // タイムゾーンを指定し日付を取得
-function todayByTimezone(timezone: string) {
-  return Utilities.formatDate(new Date(), timezone, "yyyy-MM-dd");
+function todayByTimeZone(timeZone: string) {
+  return Utilities.formatDate(new Date(), timeZone, "yyyy-MM-dd");
 }
 
 // ================

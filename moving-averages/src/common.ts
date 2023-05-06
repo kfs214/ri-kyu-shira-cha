@@ -10,3 +10,10 @@ const TICKERS = "__TICKERS__";
 // ================
 const activeSpreadSheet = SpreadsheetApp.getActiveSpreadsheet();
 const activeSpreadSheetUrl = activeSpreadSheet.getUrl();
+
+// ================
+// セル番地
+// ================
+const refDateNotation = "A1";
+const shouldNotifyNotation = "H1";
+const shortAgainstLongNotation = "G1";

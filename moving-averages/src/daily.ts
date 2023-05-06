@@ -1,9 +1,8 @@
 // 通知対象となる銘柄を抽出
-// 各シートのH2セルに計算式が存在している
 function findSheetsToBeNotified(): GoogleAppsScript.Spreadsheet.Sheet[] {
   // getValue()の戻り値はbooleanであると保証されないため、trueとの厳密比較を行う
   return getAllMemberSheets().filter(
-    (sheet) => sheet.getRange("H2").getValue() === true
+    (sheet) => sheet.getRange(shouldNotifyNotation).getValue() === true
   );
 }
 
@@ -11,7 +10,7 @@ function findSheetsToBeNotified(): GoogleAppsScript.Spreadsheet.Sheet[] {
 // GC trueを最初に
 function selectAllSheetsOrderByGC(): GoogleAppsScript.Spreadsheet.Sheet[] {
   return [...getAllMemberSheets()].sort((a) =>
-    a.getRange("H2").getValue() ? -1 : 1
+    a.getRange(shouldNotifyNotation).getValue() ? -1 : 0
   );
 }
 
@@ -39,9 +38,15 @@ function composeText(sheets: GoogleAppsScript.Spreadsheet.Sheet[]) {
   return sheets
     .map((sheet) => {
       const sheetName = sheet.getSheetName();
-      const refDate = sheet.getRange("A2").getDisplayValue() as string;
-      const shortAgainstLong = sheet.getRange("G2").getDisplayValue() as string;
-      const shouldNotify = sheet.getRange("H2").getDisplayValue() as string;
+      const refDate = sheet
+        .getRange(refDateNotation)
+        .getDisplayValue() as string;
+      const shortAgainstLong = sheet
+        .getRange(shortAgainstLongNotation)
+        .getDisplayValue() as string;
+      const shouldNotify = sheet
+        .getRange(shouldNotifyNotation)
+        .getDisplayValue() as string;
 
       return `======\n=${sheetName}\n======\n${refDate}\n10 against 50: ${shortAgainstLong}\nShould Notify: ${shouldNotify}\n${buildSheetUrl(
         sheet
@@ -67,7 +72,16 @@ function notifyByEmail() {
   const sheetsToBeNotified = findSheetsToBeNotified();
   const allSheets = selectAllSheetsOrderByGC();
   const subject = buildSubject(sheetsToBeNotified);
-  const composedText = composeText(allSheets);
+
+  const composedSheetsToBeNotified = composeText(sheetsToBeNotified);
+  const composedAllSheets = composeText(allSheets);
+  const composedText = `${composedSheetsToBeNotified}
+
+
+=========================
+all sheets
+=========================
+${composedAllSheets}`;
 
   Logger.log(
     `mail to be sent... notifiedEmail:${notifiedEmail} subject:${subject} composedText:${composedText}`

@@ -14,6 +14,6 @@ const activeSpreadSheetUrl = activeSpreadSheet.getUrl();
 // ================
 // セル番地
 // ================
-const refDateNotation = "A2";
-const shouldNotifyNotation = "J2";
-const askAgainstAvgNotation = "H2";
+const refDateNotation = "A1";
+const shouldNotifyNotation = "J1";
+const askAgainstAvgNotation = "H1";

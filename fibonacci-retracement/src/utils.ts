@@ -67,6 +67,7 @@ function copyTemplateByTickers() {
 
   // tickersの名前のsheetを追加
   tickers.forEach((ticker) => {
+    if (!ticker) return;
     Logger.log(`${ticker} to be added...`);
     templateSheet.copyTo(activeSpreadSheet).setName(ticker);
   });

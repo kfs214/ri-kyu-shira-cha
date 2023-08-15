@@ -20,14 +20,6 @@ function buildSubject(tickers: GoogleAppsScript.Spreadsheet.Sheet[]) {
   }`;
 }
 
-function buildSheetUrl(sheet: GoogleAppsScript.Spreadsheet.Sheet) {
-  return `${activeSpreadSheetUrl}#gid=${sheet.getSheetId()}`;
-}
-
-function buildFinanceUrl(ticker: string) {
-  return `https://finance.yahoo.com/quote/${ticker}/chart`;
-}
-
 function composeText(sheets: GoogleAppsScript.Spreadsheet.Sheet[]) {
   return sheets
     .map((sheet) => {
@@ -38,9 +30,6 @@ function composeText(sheets: GoogleAppsScript.Spreadsheet.Sheet[]) {
       const shouldNotify = sheet
         .getRange(shouldNotifyNotation)
         .getDisplayValue() as string;
-      const shouldSell = sheet
-        .getRange(shouldSellNotation)
-        .getDisplayValue() as string;
       const shouldBuy = sheet
         .getRange(shouldBuyNotation)
         .getDisplayValue() as string;
@@ -49,11 +38,7 @@ function composeText(sheets: GoogleAppsScript.Spreadsheet.Sheet[]) {
 =${sheetName}
 ======
 ${refDate}
-Should Notify: ${shouldNotify}
-Should Sell: ${shouldSell}
-Should Buy: ${shouldBuy}
-${buildSheetUrl(sheet)}
-${buildFinanceUrl(sheetName)}`;
+Should Buy: ${shouldBuy}`;
     })
     .join("\n\n\n");
 }
@@ -68,45 +53,25 @@ function notifyByEmail() {
     return;
   }
 
-  // データを最新化
-  // refreshAllMemberSheets();
-
   //
   // 通知内容を生成
   //
 
-  // 通知対象・売る銘柄・買う銘柄、それぞれシート抽出
-  const sheetsToBeNotified = filterSheetsByAddress(shouldNotifyNotation);
-  const sheetsToSell = filterSheetsByAddress(shouldSellNotation);
+  // 買う銘柄の通知対象シート抽出
   const sheetsToBuy = filterSheetsByAddress(shouldBuyNotation);
 
-  // 全件取得
-  const allSheets = getAllMemberSheets();
-
   // 件名生成
-  const subject = buildSubject(sheetsToBeNotified);
+  const subject = buildSubject(sheetsToBuy);
 
-  // 通知対象・売る銘柄・買う銘柄、それぞれ文字列生成
-  const composedSheetsToSell = composeText(sheetsToSell);
+  // それぞれ文字列生成
   const composedSheetsToBuy = composeText(sheetsToBuy);
-  const composedAllSheets = composeText(allSheets);
-
-  const composedText = `=========================
-to sell
-=========================
-${composedSheetsToSell}
-
-
+  const composedText = `
 =========================
 to buy
 =========================
 ${composedSheetsToBuy}
 
-
-=========================
-all sheets
-=========================
-${composedAllSheets}`;
+`;
 
   Logger.log(
     `mail to be sent... notifiedEmail:${notifiedEmail} subject:${subject} composedText:${composedText}`

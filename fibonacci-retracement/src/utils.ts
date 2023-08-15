@@ -72,6 +72,9 @@ function copyTemplateByTickers() {
     templateSheet.copyTo(activeSpreadSheet).setName(ticker);
   });
 
+  // 実行時間上限を超えるので、別途呼び出し
   // シート名の変更を関数呼び出しに反映
-  refreshAllMemberSheets();
+  // refreshAllMemberSheets();
+
+  Logger.log("Task Completed! Remember to Refresh Member Sheets.");
 }

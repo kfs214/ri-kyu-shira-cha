@@ -27,18 +27,11 @@ function composeText(sheets: GoogleAppsScript.Spreadsheet.Sheet[]) {
       const refDate = sheet
         .getRange(refDateNotation)
         .getDisplayValue() as string;
-      const shouldNotify = sheet
-        .getRange(shouldNotifyNotation)
-        .getDisplayValue() as string;
-      const shouldBuy = sheet
-        .getRange(shouldBuyNotation)
-        .getDisplayValue() as string;
 
       return `======
 =${sheetName}
 ======
-${refDate}
-Should Buy: ${shouldBuy}`;
+${refDate}`;
     })
     .join("\n\n\n");
 }
@@ -57,19 +50,19 @@ function notifyByEmail() {
   // 通知内容を生成
   //
 
-  // 買う銘柄の通知対象シート抽出
-  const sheetsToBuy = filterSheetsByAddress(shouldBuyNotation);
+  // 通知対象シート抽出
+  const sheetsToBeNotified = filterSheetsByAddress(shouldNotifyNotation);
 
   // 件名生成
-  const subject = buildSubject(sheetsToBuy);
+  const subject = buildSubject(sheetsToBeNotified);
 
   // それぞれ文字列生成
-  const composedSheetsToBuy = composeText(sheetsToBuy);
+  const composedSheetsToBeNotified = composeText(sheetsToBeNotified);
   const composedText = `
 =========================
 to buy
 =========================
-${composedSheetsToBuy}
+${composedSheetsToBeNotified}
 
 `;
 

@@ -1,4 +1,9 @@
-import { extractTicker } from "../util";
+import {
+  extractByRegex,
+  extractTicker,
+  extractDate,
+  extractPrice,
+} from "../util";
 import { expect, it, describe } from "vitest";
 
 const mailBody = `苗字　名前 様
@@ -44,9 +49,43 @@ https://www.xxx.xxx/web/support/
 xxx株式会社
 `;
 
-describe("extractTicker", () => {
+describe("extractByRegex", () => {
   describe("正常系", () => {
     it("銘柄が抽出できる ", () => {
+      const actual = extractByRegex(mailBody, /銘柄名（銘柄コード）：.+/);
+      expect(actual).toBe("某社（WWWW）");
+    });
+  });
+
+  describe("異常系", () => {
+    it("銘柄名の行が見つからない場合、例外送出して終了", () => {
+      const mailBodyWoExpectedRow = `注文番号：0123
+口座・売買：特定・買付
+決済方法：円貨
+      `;
+
+      expect(() => {
+        extractByRegex(mailBodyWoExpectedRow, /銘柄名（銘柄コード）：.+/);
+      }).toThrow();
+    });
+
+    it("銘柄名のパースに失敗した場合、例外送出して終了", () => {
+      const mailBodyWithWrongFormat = `注文番号：0123
+銘柄名（銘柄コード）某社（WWWW）
+口座・売買：特定・買付
+決済方法：円貨
+      `;
+
+      expect(() => {
+        extractByRegex(mailBodyWithWrongFormat, /銘柄名（銘柄コード）：.+/);
+      }).toThrow();
+    });
+  });
+});
+
+describe("extractTicker", () => {
+  describe("正常系", () => {
+    it("銘柄が抽出できる", () => {
       const actual = extractTicker(mailBody);
       expect(actual).toBe("某社（WWWW）");
     });
@@ -54,26 +93,82 @@ describe("extractTicker", () => {
 
   describe("異常系", () => {
     it("銘柄名の行が見つからない場合、例外送出して終了", () => {
-      const mailBodyWoTickerRow = `注文番号：0123
-口座・売買：特定・買付
-決済方法：円貨
-      `;
+      const mailBodyWoExpectedRow = `注文番号：0123`;
 
       expect(() => {
-        extractTicker(mailBodyWoTickerRow);
-      }).toThrow();
+        extractTicker(mailBodyWoExpectedRow);
+      }).toThrow("failed to extract ticker");
+    });
+  });
+});
+
+describe("extractDate", () => {
+  describe("正常系", () => {
+    it("約定日時が抽出できる", () => {
+      const actual = extractDate(mailBody);
+      expect(actual).toBe("2023/8/15 22:30");
+    });
+  });
+
+  describe("異常系", () => {
+    it("約定日時の行が見つからない場合、例外送出して終了", () => {
+      const mailBodyWoExpectedRow = `注文番号：0123`;
+
+      expect(() => {
+        extractDate(mailBodyWoExpectedRow);
+      }).toThrow("failed to extract date");
+    });
+  });
+});
+
+describe("extractPrice", () => {
+  describe("正常系", () => {
+    describe("約定単価・通貨が抽出できる", () => {
+      it("USD", () => {
+        const { unit, price } = extractPrice(mailBody);
+        expect(unit).toBe("USD");
+        expect(price).toBe("888");
+      });
+
+      it("JPY", () => {
+        const mailBodyWithJpy = `決済方法：円貨
+約定単価：512円
+約定数量：1株（口）`;
+
+        const { unit, price } = extractPrice(mailBodyWithJpy);
+        expect(unit).toBe("JPY");
+        expect(price).toBe("512");
+      });
+    });
+  });
+
+  describe("異常系", () => {
+    it("約定単価の行が見つからない場合、例外送出して終了", () => {
+      const mailBodyWoExpectedRow = `注文番号：0123`;
+
+      expect(() => {
+        extractPrice(mailBodyWoExpectedRow);
+      }).toThrow("failed to extract price");
     });
 
-    it("銘柄名のパースに失敗した場合、例外送出して終了", () => {
-      const mailBodyWoTickerRow = `注文番号：0123
-銘柄名（銘柄コード）某社（WWWW）
-口座・売買：特定・買付
-決済方法：円貨
-      `;
+    it("USD, JPY以外の場合、例外送出して終了", () => {
+      const mailBodyWithWrongFormat = `決済方法：円貨
+約定単価：100万石
+約定数量：1株（口）`;
 
       expect(() => {
-        extractTicker(mailBodyWoTickerRow);
-      }).toThrow();
+        extractPrice(mailBodyWithWrongFormat);
+      }).toThrow("failed to extract price");
+    });
+
+    it("数値のパースに失敗した場合、例外送出して終了", () => {
+      const mailBodyWithWrongFormat = `決済方法：円貨
+約定単価：ひゃく米ドル
+約定数量：1株（口）`;
+
+      expect(() => {
+        extractPrice(mailBodyWithWrongFormat);
+      }).toThrow("failed to extract price");
     });
   });
 });

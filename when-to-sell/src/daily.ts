@@ -39,8 +39,11 @@ function findTickersToBeNotified(): string[] {
         const ticker = rowValues[0];
         const bid = rowValues[3];
 
+        if (!ticker || !bid) return;
+
         return `${ticker}: ${bid}`;
       })
+      .filter((e) => e)
   );
 }
 

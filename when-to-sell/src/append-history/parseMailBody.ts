@@ -53,3 +53,16 @@ export function extractPrice(mailBody: string): {
     throw new Error("failed to extract price");
   }
 }
+
+export function parseMailBody(mailBody: string): {
+  ticker: string;
+  date: string;
+  unit: string;
+  price: string;
+} {
+  const ticker = extractTicker(mailBody);
+  const date = extractDate(mailBody);
+  const { unit, price } = extractPrice(mailBody);
+
+  return { ticker, date, unit, price };
+}

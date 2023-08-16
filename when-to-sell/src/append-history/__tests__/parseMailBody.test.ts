@@ -3,7 +3,8 @@ import {
   extractTicker,
   extractDate,
   extractPrice,
-} from "../util";
+  parseMailBody,
+} from "../parseMailBody";
 import { expect, it, describe } from "vitest";
 
 const mailBody = `苗字　名前 様
@@ -169,6 +170,28 @@ describe("extractPrice", () => {
       expect(() => {
         extractPrice(mailBodyWithWrongFormat);
       }).toThrow("failed to extract price");
+    });
+  });
+});
+
+describe("parseMailBody", () => {
+  describe("正常系", () => {
+    it("必要事項が抽出できる", () => {
+      const actual = parseMailBody(mailBody);
+      expect(actual.ticker).toBe("某社（WWWW）");
+      expect(actual.date).toBe("2023/8/15 22:30");
+      expect(actual.unit).toBe("USD");
+      expect(actual.price).toBe("888");
+    });
+  });
+
+  describe("異常系", () => {
+    it("必要な行が見つからない場合、例外送出して終了", () => {
+      const mailBodyWoExpectedRow = `注文番号：0123`;
+
+      expect(() => {
+        parseMailBody(mailBodyWoExpectedRow);
+      }).toThrow("failed to extract ticker");
     });
   });
 });

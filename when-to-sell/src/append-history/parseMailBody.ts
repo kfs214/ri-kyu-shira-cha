@@ -15,6 +15,7 @@ export function extractUnit(str: string) {
   throw new Error("");
 }
 
+// TODO GOOGLEFINANCEで取得できるように銘柄コードを抽出
 export function extractTicker(mailBody: string): string {
   const rowRegex = /銘柄名（銘柄コード）：.+/;
 
@@ -54,12 +55,7 @@ export function extractPrice(mailBody: string): {
   }
 }
 
-export function parseMailBody(mailBody: string): {
-  ticker: string;
-  date: string;
-  unit: string;
-  price: string;
-} {
+function parseMailBody(mailBody: string): History {
   const ticker = extractTicker(mailBody);
   const date = extractDate(mailBody);
   const { unit, price } = extractPrice(mailBody);

@@ -50,7 +50,7 @@ export function extractPrice(mailBody: string): {
   try {
     const priceStr = extractByRegex(mailBody, rowRegex);
     const unit = extractUnit(priceStr);
-    const [price] = priceStr.match(/\d+/);
+    const [price] = priceStr.match(/\d+\.?\d*/);
 
     if (!price) throw new Error("");
 

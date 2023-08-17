@@ -15,7 +15,7 @@ const mailBody = `苗字　名前 様
 銘柄名（銘柄コード）：某社（WWWW）
 口座・売買：特定・買付
 決済方法：円貨
-約定単価：888米ドル
+約定単価：888.12米ドル
 約定数量：1株（口）
 約定日時：2023/8/15 22:30
 
@@ -133,13 +133,23 @@ describe("extractDate", () => {
 describe("extractPrice", () => {
   describe("正常系", () => {
     describe("約定単価・通貨が抽出できる", () => {
-      it("USD", () => {
+      it("USD、小数点あり", () => {
         const { unit, price } = extractPrice(mailBody);
+        expect(unit).toBe("USD");
+        expect(price).toBe("888.12");
+      });
+
+      it("USD、小数点なし", () => {
+        const mailBodyWithJpy = `決済方法：円貨
+約定単価：888米ドル
+約定数量：1株（口）`;
+
+        const { unit, price } = extractPrice(mailBodyWithJpy);
         expect(unit).toBe("USD");
         expect(price).toBe("888");
       });
 
-      it("JPY", () => {
+      it("JPY、小数点なし", () => {
         const mailBodyWithJpy = `決済方法：円貨
 約定単価：512円
 約定数量：1株（口）`;
@@ -189,7 +199,7 @@ describe("extractPrice", () => {
 //       expect(actual.ticker).toBe("某社（WWWW）");
 //       expect(actual.date).toBe("2023/8/15 22:30");
 //       expect(actual.unit).toBe("USD");
-//       expect(actual.price).toBe("888");
+//       expect(actual.price).toBe("888.12");
 //     });
 //   });
 

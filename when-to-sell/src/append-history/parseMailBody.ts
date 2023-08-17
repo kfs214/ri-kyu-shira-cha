@@ -18,9 +18,15 @@ export function extractUnit(str: string) {
 // TODO GOOGLEFINANCEで取得できるように銘柄コードを抽出
 export function extractTicker(mailBody: string): string {
   const rowRegex = /銘柄名（銘柄コード）：.+/;
+  const tickerRegex = /(?<=（).+?(?=）)/;
 
   try {
-    return extractByRegex(mailBody, rowRegex);
+    const descriptionRow = extractByRegex(mailBody, rowRegex);
+    const [ticker] = descriptionRow.match(tickerRegex);
+
+    if (!ticker) throw new Error("");
+
+    return ticker;
   } catch (e) {
     throw new Error("failed to extract ticker");
   }

@@ -88,13 +88,21 @@ describe("extractTicker", () => {
   describe("正常系", () => {
     it("銘柄が抽出できる", () => {
       const actual = extractTicker(mailBody);
-      expect(actual).toBe("某社（WWWW）");
+      expect(actual).toBe("WWWW");
     });
   });
 
   describe("異常系", () => {
     it("銘柄名の行が見つからない場合、例外送出して終了", () => {
       const mailBodyWoExpectedRow = `注文番号：0123`;
+
+      expect(() => {
+        extractTicker(mailBodyWoExpectedRow);
+      }).toThrow("failed to extract ticker");
+    });
+
+    it("銘柄コードが見つからない場合、例外送出して終了", () => {
+      const mailBodyWoExpectedRow = `銘柄名（銘柄コード）：某社（）`;
 
       expect(() => {
         extractTicker(mailBodyWoExpectedRow);

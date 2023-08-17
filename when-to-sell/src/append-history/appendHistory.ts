@@ -1,7 +1,6 @@
 function findThreads(): GoogleAppsScript.Gmail.GmailThread[] {
   const threads = GmailApp.search(
-    // "from:(tradesys@rakuten-sec.co.jp) subject:(の注文が約定しました) newer_than:28h label:automation/処理待"
-    "subject:(の注文が約定しました) newer_than:28h label:automation/処理待"
+    "from:(tradesys@rakuten-sec.co.jp) subject:(の注文が約定しました) newer_than:28h label:automation/処理待"
   );
 
   Logger.log(`found ${threads.length} threads`);

@@ -6,7 +6,8 @@
   "scripts": {
     "test": "vitest run",
     "open": "clasp open",
-    "push": "clasp push"
+    "push": "clasp push",
+    "prettier": "prettier --write 'src/**/*.{ts,json}'"
   },
   "keywords": [],
   "author": "",

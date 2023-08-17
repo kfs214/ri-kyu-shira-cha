@@ -34,5 +34,20 @@ function appendToSheet(history: History) {
     SpreadsheetApp.AutoFillSeries.DEFAULT_SERIES
   );
 
-  // TODO 書式を上からコピー
+  // 書式を上からコピー
+  const formatCopiedFromRange = usdHistorySheet.getRange(
+    filledLastRow,
+    colFormatCopiedFrom,
+    1,
+    colFormatCopiedNum
+  );
+
+  const formatCopiedToRange = usdHistorySheet.getRange(
+    addedLastRow,
+    colFormatCopiedFrom,
+    1,
+    colFormatCopiedNum
+  );
+
+  formatCopiedFromRange.copyTo(formatCopiedToRange, { formatOnly: true });
 }

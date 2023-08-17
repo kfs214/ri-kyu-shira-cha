@@ -3,8 +3,10 @@ import {
   extractTicker,
   extractDate,
   extractPrice,
+  extractTradeType,
   // parseMailBody,
 } from "../parseMailBody";
+
 import { expect, it, describe } from "vitest";
 
 const mailBody = `苗字　名前 様
@@ -191,6 +193,51 @@ describe("extractPrice", () => {
     });
   });
 });
+
+// TradeTypeのexportが必要になるが、GASではグローバル空間が参照されるため、テスト無効化する
+// describe("extractTradeType", () => {
+//   describe("正常系", () => {
+//     it("買い通知が抽出できる", () => {
+//       const actual = extractTradeType(mailBody);
+//       expect(actual).toBe(TradeType.BUY);
+//     });
+
+//     it("売り通知が抽出できる", () => {
+//       const mailBodySold = `銘柄名（銘柄コード）：某社（WWWW）
+// 口座・売買：特定・売付
+// 決済方法：円貨`;
+
+//       const actual = extractTradeType(mailBodySold);
+//       expect(actual).toBe(TradeType.SELL);
+//     });
+//   });
+
+//   describe("異常系", () => {
+//     it("売買の行が見つからない場合、例外送出して終了", () => {
+//       const mailBodyWoExpectedRow = `注文番号：0123`;
+
+//       expect(() => {
+//         extractTradeType(mailBodyWoExpectedRow);
+//       }).toThrow("failed to extract trade type");
+//     });
+
+//     it("フォーマットが誤っている場合、例外送出して終了", () => {
+//       const mailBodyWoExpectedRow = `口座・売買：特定売付`;
+
+//       expect(() => {
+//         extractTradeType(mailBodyWoExpectedRow);
+//       }).toThrow("failed to extract trade type");
+//     });
+
+//     it("売買以外の場合、例外送出して終了", () => {
+//       const mailBodyWoExpectedRow = `口座・売買：特定・付`;
+
+//       expect(() => {
+//         extractTradeType(mailBodyWoExpectedRow);
+//       }).toThrow("failed to extract trade type");
+//     });
+//   });
+// });
 
 // describe("parseMailBody", () => {
 //   describe("正常系", () => {

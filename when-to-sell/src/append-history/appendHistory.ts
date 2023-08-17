@@ -33,6 +33,7 @@ function handleThread(thread: GoogleAppsScript.Gmail.GmailThread) {
   }
 }
 
+// TODO 売れました通知の場合は行削除
 function appendHistory() {
   const threads = findThreads();
 

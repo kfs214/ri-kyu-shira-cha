@@ -60,10 +60,34 @@ export function extractPrice(mailBody: string): {
   }
 }
 
+export function extractTradeType(mailBody: string): TradeType {
+  const rowRegex = /口座・売買：.+/;
+
+  try {
+    const row = extractByRegex(mailBody, rowRegex);
+    const tradeTypeStr = row.split("・")[1];
+    if (!tradeTypeStr) throw new Error("");
+
+    switch (tradeTypeStr) {
+      case "売付":
+        return TradeType.SELL;
+
+      case "買付":
+        return TradeType.BUY;
+
+      default:
+        throw new Error("");
+    }
+  } catch (e) {
+    throw new Error("failed to extract trade type");
+  }
+}
+
 function parseMailBody(mailBody: string): History {
   const ticker = extractTicker(mailBody);
   const date = extractDate(mailBody);
   const { unit, price } = extractPrice(mailBody);
+  const tradeType = extractTradeType(mailBody);
 
-  return { ticker, date, unit, price };
+  return { ticker, date, unit, price, tradeType };
 }

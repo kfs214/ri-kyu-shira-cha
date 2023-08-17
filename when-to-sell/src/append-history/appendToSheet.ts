@@ -1,5 +1,8 @@
 function appendToSheet(history: History) {
-  const { ticker, date, price } = history;
+  const { ticker, date, price, tradeType } = history;
+
+  // TODO 売れました通知の場合は行削除
+  if (tradeType !== TradeType.BUY) return;
 
   const usdHistorySheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(
     USD_HISTORY_SHEET_NAME
@@ -50,4 +53,7 @@ function appendToSheet(history: History) {
   );
 
   formatCopiedFromRange.copyTo(formatCopiedToRange, { formatOnly: true });
+
+  // 買い通知があったことをメール通知
+  notifyUnderCondition(history);
 }

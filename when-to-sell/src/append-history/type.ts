@@ -3,4 +3,5 @@ type History = {
   date: string;
   unit: string;
   price: string;
+  tradeType: TradeType;
 };

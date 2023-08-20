@@ -20,6 +20,12 @@ function buildSubject(tickers: GoogleAppsScript.Spreadsheet.Sheet[]) {
   }`;
 }
 
+function buildFinanceUrl(ticker: string) {
+  const tickerSplit = ticker.split(":");
+  const symbol = tickerSplit[1] ?? tickerSplit[0];
+  return `https://finance.yahoo.com/quote/${symbol}/chart`;
+}
+
 function composeText(sheets: GoogleAppsScript.Spreadsheet.Sheet[]) {
   return sheets
     .map((sheet) => {
@@ -31,7 +37,8 @@ function composeText(sheets: GoogleAppsScript.Spreadsheet.Sheet[]) {
       return `======
 =${sheetName}
 ======
-${refDate}`;
+${refDate}
+${buildFinanceUrl(sheetName)}`;
     })
     .join("\n\n\n");
 }

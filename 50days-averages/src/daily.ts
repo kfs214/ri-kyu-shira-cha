@@ -33,7 +33,9 @@ function buildSheetUrl(sheet: GoogleAppsScript.Spreadsheet.Sheet) {
 }
 
 function buildFinanceUrl(ticker: string) {
-  return `https://finance.yahoo.com/quote/${ticker}/chart`;
+  const tickerSplit = ticker.split(":");
+  const symbol = tickerSplit[1] ?? tickerSplit[0];
+  return `https://finance.yahoo.com/quote/${symbol}/chart`;
 }
 
 function composeText(sheets: GoogleAppsScript.Spreadsheet.Sheet[]) {

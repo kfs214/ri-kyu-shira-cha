@@ -45,6 +45,37 @@ function refreshAllMemberSheets(): void {
   Logger.log("refreshing completed.");
 }
 
+// should be refreshed: TRUEのものを更新
+// 実行時間制限を回避するための分割に使用
+function refreshSheets(): void {
+  const tickersSheet = activeSpreadSheet.getSheetByName(TICKERS);
+  if (!tickersSheet) {
+    Logger.log(`sheet not found: ${TICKERS}`);
+    return;
+  }
+
+  // tickers取得
+  const lastRowIndex = tickersSheet.getLastRow();
+  const tickersRange = tickersSheet.getRange(2, 1, lastRowIndex, 4);
+  const tickers = tickersRange
+    .getValues()
+    .map(([ticker, _, _1, shouldBeNotified]) => {
+      if (!ticker || !shouldBeNotified) return;
+      return ticker;
+    })
+    .filter((e) => e) as string[];
+
+  Logger.log({ tickers });
+
+  tickers.forEach((ticker) => {
+    const sheet = activeSpreadSheet.getSheetByName(ticker);
+    if (!sheet) return;
+    sheet.insertRows(1, 1);
+    sheet.deleteRows(1, 1);
+  });
+  Logger.log("refreshing completed.");
+}
+
 // 設定シートのtickerからシート作成
 function copyTemplateByTickers() {
   // テンプレートシート・設定シートを取得
@@ -67,10 +98,12 @@ function copyTemplateByTickers() {
 
   // tickersの名前のsheetを追加
   tickers.forEach((ticker) => {
+    if (!ticker) return;
     Logger.log(`${ticker} to be added...`);
     templateSheet.copyTo(activeSpreadSheet).setName(ticker);
   });
 
   // シート名の変更を関数呼び出しに反映
-  refreshAllMemberSheets();
+  // 実行時間上限を回避するため、処理できる件数にフラグを立てておく
+  refreshSheets();
 }
